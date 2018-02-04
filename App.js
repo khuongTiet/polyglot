@@ -1,15 +1,23 @@
 import React from 'react';
+import Expo from 'expo';
 import { StyleSheet, Text, View } from 'react-native';
+import FrontPage from './frontPage.js';
 
 export default class App extends React.Component {
-  render() {
-    return (
-      <View style={styles.container}>
-        <Text>Open up App.js to start working on your app!</Text>
-        <Text>Changes you make will automatically reload.</Text>
-        <Text>Shake your phone to open the developer menu.</Text>
-      </View>
-    );
+  state = { fontsAreLoaded: false };
+
+  async componentWillMount() {
+    await Expo.Font.loadAsync({
+      'Roboto_medium': require('native-base/Fonts/Roboto_medium.ttf')
+    });
+    this.setState({fontsAreLoaded: true});
+  }
+
+  render () {
+    if (this.state.fontsAreLoaded)
+      return <FrontPage/>;
+    else
+      return <Expo.AppLoading />;
   }
 }
 
