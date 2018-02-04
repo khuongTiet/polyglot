@@ -13,6 +13,7 @@ import {
   Item,
   Input,
   Button,
+  Spinner,
   Text } from 'native-base';
 
 export default class Client extends React.Component {
@@ -28,13 +29,25 @@ export default class Client extends React.Component {
       }
       this.receiveMessage = this.receiveMessage.bind(this);
       this.sendMessage = this.sendMessage.bind(this);
-      this.socket = SocketIOClient('http://f14b2dee.ngrok.io', { transports: ['websocket'] });
-      this.socket.on("connect", function() {
-        console.log("Connected");
-      })
+      this.socket = SocketIOClient('http://e99bfd18.ngrok.io', { transports: ['websocket'] });
+      this.getMessages = this.getMessages.bind(this)
   }
 
+  componentWillMount () {
+    this.getMessages();
+  }
+
+  getMessages () {
+    fetch(`http://e99bfd18.ngrok.io/rooms/${this.state.category}/`)
+      .then((response) => response.json())
+      .then((responseJSON) => this.setState({ messages: responseJSON.messages }));
+  }
+
+
   sendMessage (message) {
+    if (message.length === 0) {
+      return;
+    }
     const messageBody = {
       'text': message,
       'user': this.state.myName,
@@ -47,19 +60,17 @@ export default class Client extends React.Component {
     this.setState({text: ''});
   }
 
+
   receiveMessage(msg){
-      console.log("Received");
-      console.log(msg);
       this.setState({messages : msg});
   }
 
   render (){
-    this.socket.on("json", this.receiveMessage)
     return (
       <Card>
         <Card>
           {
-            this.state.messages.map((message) =>
+            this.state.messages.length > 0 ? this.state.messages.map((message) =>
               <Card>
                 <CardItem>
                   <Body>
@@ -69,7 +80,7 @@ export default class Client extends React.Component {
                   </Body>
                 </CardItem>
               </Card>
-            )
+            ) : <Card />
           }
         </Card>
         <Item>
