@@ -35,7 +35,7 @@ export default class Room extends React.Component {
         'Content-Type': 'application/x-www-form-urlencoded'
       },
       body: JSON.stringify({
-        'action': 'join'
+        'joinRoom': 'join'
       })
     }).then((response) => response.json())
       .then((data) => this.setState({ roomUserName: data.username }));
@@ -47,26 +47,17 @@ export default class Room extends React.Component {
 
     return (
       <Container style={styles.container}>
-        <Header>
-          <Body>
-            <Title>
-              {this.state.roomUserName}
-            </Title>
-          </Body>
-        </Header>
         <Content>
           <Card>
             <CardItem>
               <Body>
                 <Text>
-                   There are currently {this.state.numberOfUsers} users in this room.
+                   You are posting as {this.state.roomUsername || "__"} in this room.
                 </Text>
               </Body>
             </CardItem>
           </Card>
-          <Card>
-            <Client userName = {this.state.roomUserName}/>
-          </Card>
+          <Client userName = {this.state.roomUserName}/>
         </Content>
       </Container>
     );

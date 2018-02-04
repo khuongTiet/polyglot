@@ -77,7 +77,7 @@ export default class Client extends React.Component {
           />
 
         </Item>
-  
+
          <Button danger onPress={()=> {this.sendMessage(this.state.text);}}><Text>Enter</Text></Button>
 
       </Card>
