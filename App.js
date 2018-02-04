@@ -5,9 +5,16 @@ import { StackNavigator } from 'react-navigation';
 import Room from './Room.js';
 import FrontPage from './frontPage.js';
 
+console.disableYellowBox = true;
+
 const MainScreenNavigator = StackNavigator(
   {
-    Front: { screen: FrontPage },
+    Front: {
+      screen: FrontPage,
+      navigationOptions: ({ navigation }) => ({
+        title: 'PolyGlot'
+      })
+     },
     Chat: {
       screen: Room,
       navigationOptions: ({ navigation }) => ({

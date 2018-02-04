@@ -26,14 +26,11 @@ export default class Room extends React.Component {
     this.getUserName();
   }
 
-  async getUserName () {
+  getUserName () {
     const { params } = this.props.navigation.state;
     const title = params ? params.title : null;
     fetch(`http://e99bfd18.ngrok.io/rooms/${title.toLowerCase()}/`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-      },
       body: JSON.stringify({
         'action': 'join'
       })
@@ -46,7 +43,7 @@ export default class Room extends React.Component {
     const title = params ? params.title : null;
 
     return (
-      <Container style={styles.container}>
+      <Container>
         <Content>
           <Card>
             <CardItem>

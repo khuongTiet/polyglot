@@ -83,17 +83,22 @@ export default class Client extends React.Component {
             ) : <Card />
           }
         </Card>
-        <Item>
-          <Input
-              placeholder="Enter text here."
-              onChangeText={(text) => this.setState({text})}
-              value={this.state.text}
-          />
-
-        </Item>
-
-         <Button danger onPress={()=> {this.sendMessage(this.state.text);}}><Text>Enter</Text></Button>
-
+        <Card>
+          <Grid>
+            <Col size={80}>
+              <Item>
+                <Input
+                    placeholder="Enter text here."
+                    onChangeText={(text) => this.setState({text})}
+                    value={this.state.text}
+                />
+              </Item>
+            </Col>
+            <Col size={20}>
+              <Button danger onPress={()=> {this.sendMessage(this.state.text);}}><Text>Enter</Text></Button>
+            </Col>
+          </Grid>
+        </Card>
       </Card>
     );
   }
