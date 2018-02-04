@@ -12,7 +12,7 @@ import {
   Item,
   Input,
   Text } from 'native-base';
-
+import Client from './clientChat.js'
 export default class Room extends React.Component {
   constructor (props) {
     super(props);
@@ -65,17 +65,8 @@ export default class Room extends React.Component {
             </CardItem>
           </Card>
           <Card>
-            <CardItem>
-              <Body>
-                <Text>
-                  PLACEHOLDER
-                </Text>
-              </Body>
-            </CardItem>
+            <Client userName = {this.state.roomUserName}/>
           </Card>
-          <Item>
-            <Input placeholder="Enter text here." />
-          </Item>
         </Content>
       </Container>
     );
