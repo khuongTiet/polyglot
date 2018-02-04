@@ -1,167 +1,49 @@
 from flask import Flask, request, redirect
 from flask import jsonify
-from flask_socketio import SocketIO, emit, send, join_room, leave_room
 import time
 import eventlet
 import eventlet.wsgi
 import socketio
+import random
 
 app = Flask(__name__)
 sio = socketio.Server()
 
-USER_NAMES = ["Jimmy", "David", "Bob", "Mark", "Alicia", "Tony", "Sam"] #constant storing all available names
-Rooms = {"food":[], "sports":[], "movies":[], "hiking":[]} #values are lists of Room objects
-Num_rooms = {x:0 for x in Rooms.keys()}
-
 room = {
     "food": {
+        "available_names": ["Apple", "Banana", "Orange", "Pizza", "Ramen", "Bagel", "Taco", "Eggroll", "Sushi"],
         "messages": [
         ]
     },
     "sports": {
+        "available_names": ["Basketball", "Baseball", "Football", "Soccer Ball", "Tennis Ball", "Golf Ball", "Lavar Ball", "Volleyball", "Ping Pong Ball"],
         "messages":[
         ]
     },
     "movies": {
+        "available_names": ["Horror", "Romance", "Comedy", "Action", "Mystery", "Drama", "Animated", "Musical", "Documentary"],
         "messages":[
         ]
     },
     "hiking": {
+        "available_names": ["Cougar", "Beaver", "Mountain Lion", "Otter", "Squirrel", "Deer", "Snake", "Hawk", "Bear"],
         "messages":[
         ]
     }
 }
 
-
-
-class Room:
-    def __init__(self, cat: str, id: int):
-        self.room_id = id
-        self.number_users = 0
-        self.available_names = list(USER_NAMES) #shallow copy of list
-        self.active_users = []
-        self.category = cat
-        self.message_board = [] #list of Message objects
-
-    def add_user(self) -> "User":
-        user = User(self.get_available_name(), self.category, self)
-        self.active_users.append(user)
-        self.number_users += 1
-        return user
-
-    def del_user(self, u: "User"):
-        self.available_names.insert(0, u.name)
-        self.active_users.remove(u)
-        self.number_users -= 1
-
-    def get_number_users(self):
-        return self.number_users
-
-    def get_available_name(self):
-        return self.available_names.pop()
-
-    def get_active_users(self) -> "Users":
-       return self.active_users
-
-    def get_active_users_str(self) -> str:
-        return [x.name for x in self.active_users]
-
-    def get_messages(self) -> [str]: #returns list of messages, text only
-        to_return = []
-        for m in self.message_board:
-            to_return.append((m.get_text(), m.user, m.time))
-        return to_return
-
-
-class User:
-    def __init__(self, n: str, cat: str, room: "Room"):
-        self.name = n
-        self.cat = cat
-        self.room = room
-
-    def add_message(self, text: str):
-        self.room.message_board.append(Message(text, self.name))
-
-    def get_name(self):
-        return self.name
-
-    def get_cat(self):
-        return self.cat
-
-
-class Message:
-    def __init__(self, text: str, user: "User"):
-        self.text = text
-        self.time = time.asctime(time.localtime(time.time()))
-        self.user = user
-
-    def get_text(self):
-        return self.text
-
-    def get_time(self):
-        return self.time
-
-    def get_user(self):
-        return self.user
-
-def init_rooms():
-    for key in Rooms.keys():
-        Rooms[key].append(Room(key, 0))
-
-@app.route("/rooms/<string:category>/<int:id>", methods= ['POST', 'GET'])
-def build_chat(category: str, id: int):
-    room = Rooms[category][id]
+@app.route("/rooms/<string:category>/", methods= ['POST', 'GET'])
+def build_chat(category: str):
     if request.method == 'POST':
         get_json = request.get_json(force= True)
         action = get_json['action']
         if action  == "join":
-            return jsonify({"username":room.add_user().get_name()})
-        elif action == "add_message":
-            user = get_json['user']
-            text = get_json['text']
-            for u in room.get_active_users():
-                if user == u.name:
-                    u.add_message(text)
-                    break
+            return jsonify({"username": room[category]['available_names'].pop(random.randrange(len(room) - 1))})
+    return jsonify({"messages": room[category]['messages']})
 
-    to_return = {"num_users":room.get_number_users(), "active_users":room.get_active_users_str(),
-                 "messages":room.get_messages()}
-
-    return jsonify(to_return)
-
-@app.route("/rooms/<string:category>/<int:id>/messages", methods= ['POST', 'GET'])
-def build_messages(category: str, id: int):
-    room = Rooms[category][id]
-
-    if request.method == 'POST':
-        get_json = request.get_json(force=True)
-        add = get_json['add']
-        user = add['user']
-        for u in room.get_active_users():
-            if user == u.name:
-                u.add_message(add['text'])
-
-    return jsonify({"messages": room.message_board})
-
-# @socketio.on('join')
-# def on_join(data):
-#     username = data['name']
-#     category = data['category']
-#     id = data['id']
-#     send(username + 'has entered the room')
-#
-# @socketio.on('json')
-# def handleMessage(data):
-#     emit('message', data['message'], room = data['room'])
-#
-# @socketio.on('leave')
-# def on_leave(data):
-#     print('Client disconnected')
 
 @sio.on('json')
 def handleMessage(sid, json):
-    print(sid)
-    print(json)
     room[json['category']]['messages'].append({'body': json['text']})
     sio.emit('json', room[json['category']]['messages'])
 
@@ -169,8 +51,11 @@ def handleMessage(sid, json):
 def handleConnect(sid, environ):
     print("connected", sid)
 
+@sio.on('load')
+def handleLoad(sid, json):
+    sio.emit('load', room[json['category']])
+
 if __name__ == "__main__":
     app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
-    init_rooms()
     app = socketio.Middleware(sio, app)
     eventlet.wsgi.server(eventlet.listen(('', 8000)), app)
