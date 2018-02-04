@@ -1,29 +1,44 @@
 import React from 'react';
 import Expo from 'expo';
-import { StyleSheet, Text, View } from 'react-native';
+import { Dimensions, StyleSheet, Text, View } from 'react-native';
 import { StackNavigator } from 'react-navigation';
 import Room from './Room.js';
+import FrontPage from './frontPage.js';
 
 const MainScreenNavigator = StackNavigator(
   {
     Front: { screen: FrontPage },
-    Chat: { screen: Room }
+    Chat: {
+      screen: Room,
+      navigationOptions: ({ navigation }) => ({
+        title: `${navigation.state.params.title}`
+      })
+     }
   }
 );
 
 export default class App extends React.Component {
-  state = { fontsAreLoaded: false };
+  constructor(props) {
+    super(props);
+    this.state = {
+      fontsAreLoaded: false
+    }
+  }
 
   async componentWillMount() {
     await Expo.Font.loadAsync({
+      'Roboto': require('native-base/Fonts/Roboto.ttf'),
       'Roboto_medium': require('native-base/Fonts/Roboto_medium.ttf')
     });
     this.setState({fontsAreLoaded: true});
   }
 
   render () {
-    if (this.state.fontsAreLoaded)
-      return <Room/>;
+    if (this.state.fontsAreLoaded) {
+      return (
+        <MainScreenNavigator style={{ width: Dimensions.get('window').width }} />
+      )
+    }
     else
       return <Expo.AppLoading />;
   }

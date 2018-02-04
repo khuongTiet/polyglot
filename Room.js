@@ -12,28 +12,45 @@ import {
   Item,
   Input,
   Text } from 'native-base';
-import IO from ‘socket.io-client/socket.io’;
 
 export default class Room extends React.Component {
   constructor (props) {
     super(props);
     this.state = {
+      roomUserName: '',
       numberOfUsers: 0
     }
-    this.socket = IO(127.0)
   }
 
-  async getUsers() {
-    fetch('')
+  componentWillMount() {
+    this.getUserName();
+  }
+
+  async getUserName () {
+    const { params } = this.props.navigation.state;
+    const title = params ? params.title : null;
+    fetch(`http://6c5b3b93.ngrok.io/rooms/${title.toLowerCase()}/0`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: JSON.stringify({
+        'action': 'join'
+      })
+    }).then((response) => response.json())
+      .then((data) => this.setState({ roomUserName: data.username }));
   }
 
   render () {
+    const { params } = this.props.navigation.state;
+    const title = params ? params.title : null;
+
     return (
       <Container style={styles.container}>
         <Header>
           <Body>
             <Title>
-              Food
+              {this.state.roomUserName}
             </Title>
           </Body>
         </Header>
