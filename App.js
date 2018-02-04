@@ -10,10 +10,10 @@ console.disableYellowBox = true;
 const MainScreenNavigator = StackNavigator(
   {
     Front: {
-      screen: FrontPage,
-      navigationOptions: ({ navigation }) => ({
-        title: 'PolyGlot'
-      })
+        screen: FrontPage,
+        navigationOptions: ({ navigation }) => ({
+          title: "Polyglot."
+        })
      },
     Chat: {
       screen: Room,
