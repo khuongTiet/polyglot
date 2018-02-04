@@ -29,7 +29,7 @@ export default class Room extends React.Component {
   async getUserName () {
     const { params } = this.props.navigation.state;
     const title = params ? params.title : null;
-    fetch(`http://4b3ea457.ngrok.io/rooms/${title.toLowerCase()}/0`, {
+    fetch(`http://f14b2dee.ngrok.io/rooms/${title.toLowerCase()}/0`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
@@ -57,7 +57,7 @@ export default class Room extends React.Component {
               </Body>
             </CardItem>
           </Card>
-          <Client userName={this.state.roomUserName}/>
+          <Client userName={this.state.roomUserName} category={title.toLowerCase()}/>
         </Content>
       </Container>
     );

@@ -19,26 +19,19 @@ export default class Client extends React.Component {
   constructor(props) {
       super(props);
       this.state = {
-          messages: [
-            {
-              "body": "Hello"
-            },
-            {
-              "body": "Hi"
-            },
-            {
-              "body": "new message"
-            }
-          ],
+          messages: [],
           userID: null,
           myName: props.userName,
           text: '',
           roomID: 0,
-          category: 'food'
+          category: props.category
       }
       this.receiveMessage = this.receiveMessage.bind(this);
       this.sendMessage = this.sendMessage.bind(this);
-      this.socket = SocketIOClient("http://4b3ea457.ngrok.io");
+      this.socket = SocketIOClient('http://f14b2dee.ngrok.io', { transports: ['websocket'] });
+      this.socket.on("connect", function() {
+        console.log("Connected");
+      })
   }
 
   sendMessage (message) {
@@ -49,10 +42,14 @@ export default class Client extends React.Component {
       'category': this.state.category
     }
     this.socket.emit("json", messageBody);
+    this.socket.on("json", this.receiveMessage);
+    console.log(this.state.messages);
     this.setState({text: ''});
   }
 
   receiveMessage(msg){
+      console.log("Received");
+      console.log(msg);
       this.setState({messages : msg});
   }
 
