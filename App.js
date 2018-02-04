@@ -7,7 +7,12 @@ import FrontPage from './frontPage.js';
 
 const MainScreenNavigator = StackNavigator(
   {
-    Front: { screen: FrontPage },
+    Front: {
+        screen: FrontPage,
+        navigationOptions: ({ navigation }) => ({
+          title: "Polyglot."
+        })
+     },
     Chat: {
       screen: Room,
       navigationOptions: ({ navigation }) => ({
