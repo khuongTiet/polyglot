@@ -20,54 +20,60 @@ export default class Client extends React.Component {
       super(props);
       this.state = {
           messages: [
-              {
-                  "body": "Hello"
-              },
-              {
-                  "body": "Hi"
-              },
-              {
-                  "body": "new message"
-              }
+            {
+              "body": "Hello"
+            },
+            {
+              "body": "Hi"
+            },
+            {
+              "body": "new message"
+            }
           ],
           userID: null,
           myName: props.userName,
-          text: ""
+          text: '',
+          roomID: 0,
+          category: 'food'
       }
       this.receiveMessage = this.receiveMessage.bind(this);
       this.sendMessage = this.sendMessage.bind(this);
-      this.socket = SocketIOClient("http://localhost:8000");
-      this.socket.on("Connected to room...", JSON);
+      this.socket = SocketIOClient("http://4b3ea457.ngrok.io");
   }
 
   sendMessage (message) {
-      this.socket.emit("message", message);
-      this.setState({text: ''});
+    const messageBody = {
+      'text': message,
+      'user': this.state.myName,
+      'room': this.state.roomID,
+      'category': this.state.category
+    }
+    this.socket.emit("json", messageBody);
+    this.setState({text: ''});
   }
 
   receiveMessage(msg){
-      this.setState({messages : this.state.messages.append(msg)});
+      this.setState({messages : msg});
   }
 
-
-
   render (){
-    const roomMessages = this.state.messages.map((message) =>
-      <Card>
-        <CardItem>
-          <Body>
-            <Text>
-              {message.body}
-            </Text>
-          </Body>
-        </CardItem>
-      </Card>
-    );
-
+    this.socket.on("json", this.receiveMessage)
     return (
       <Card>
         <Card>
-          {roomMessages}
+          {
+            this.state.messages.map((message) =>
+              <Card>
+                <CardItem>
+                  <Body>
+                    <Text>
+                      {message.body}
+                    </Text>
+                  </Body>
+                </CardItem>
+              </Card>
+            )
+          }
         </Card>
         <Item>
           <Input

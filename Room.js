@@ -22,20 +22,20 @@ export default class Room extends React.Component {
     }
   }
 
-  componentWillMount() {
+  componentWillMount () {
     this.getUserName();
   }
 
   async getUserName () {
     const { params } = this.props.navigation.state;
     const title = params ? params.title : null;
-    fetch(`http://6c5b3b93.ngrok.io/rooms/${title.toLowerCase()}/0`, {
+    fetch(`http://4b3ea457.ngrok.io/rooms/${title.toLowerCase()}/0`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
       },
       body: JSON.stringify({
-        'joinRoom': 'join'
+        'action': 'join'
       })
     }).then((response) => response.json())
       .then((data) => this.setState({ roomUserName: data.username }));
@@ -52,12 +52,12 @@ export default class Room extends React.Component {
             <CardItem>
               <Body>
                 <Text>
-                   You are posting as {this.state.roomUsername || "__"} in this room.
+                   You are posting in this room as {this.state.roomUserName}
                 </Text>
               </Body>
             </CardItem>
           </Card>
-          <Client userName = {this.state.roomUserName}/>
+          <Client userName={this.state.roomUserName}/>
         </Content>
       </Container>
     );
